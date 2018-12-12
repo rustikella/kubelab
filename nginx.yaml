@@ -1,0 +1,11 @@
+apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: nginx-deployment
+    namespace: labdeploy
+  spec:
+    template:
+      spec:
+        containers:
+        - name: nginx
+          image: nginx:1.7.9
