@@ -1,0 +1,53 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: sonarqube
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      containers:
+      - name: sonarqube
+        image: sonarqube:6.5
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonar-service
+  namespace: labdeploy
+spec:
+  selector:
+    app: sonarqube
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9000
+    protocol: TCP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: labdeploy
+  name: sonar-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+  rules:
+  - host: sonar.almarancher.westeurope.cloudapp.azure.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: sonar-service
+          servicePort: http
